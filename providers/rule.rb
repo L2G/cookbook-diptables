@@ -4,6 +4,7 @@ include Chef::Mixin::ShellOut
 include DiptablesHandlerDefiner
 
 action :add do
+  p "wkpo!! on essaie d'adder une rule #{new_resource}"
     Chef::Log.debug("Adding rule to #{new_resource.table} : #{new_resource.chain} (#{new_resource.rule})")
     define_diptables_handler
 

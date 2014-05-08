@@ -1,6 +1,7 @@
 # This LWRP is actually just a convenient alias for the rule one
 
 action :add do
+  p "bordel on essaie de mettre la rule?"
     diptables_rule new_resource.name do
         table new_resource.table
         chain new_resource.chain
@@ -12,5 +13,6 @@ action :add do
             same_environment new_resource.same_environment
             placeholders({new_resource.class::SOURCE_PLACEHOLDER.to_sym => new_resource.source_method})
         end
-    end
+        action :nothing
+    end.run_action :add, :immediately
 end

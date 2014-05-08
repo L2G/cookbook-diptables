@@ -4,9 +4,15 @@
 # For example, here we set up a pretty simple web server listening specifically
 # on the eth0 interface to a set of white-listed IP addresses
 
+diptables_apply 'apply' do
+  action :nothing
+end
+
 # we allow everything on the loopback interface
 diptables_rule 'loopback_interface' do
     rule '-i lo'
+    # action :nothing
+    # notifies :apply, 'diptables_apply[apply]', :delayed
 end
 
 # anyone is welcome to SSH
@@ -19,6 +25,7 @@ diptables_tcp_udp_rule 'http_https_web_server' do
     dport [80, 443]
     source ['1.2.3.4', '5.6.7.8']
     interface 'eth0'
+    action :nothing
 end
 
 # we allow all icpm and igmp traffic
@@ -38,10 +45,12 @@ end
 diptables_rule 'ddos_log' do
     rule '-m limit --limit 1/sec --limit-burst 1000 -j LOG --log-prefix "REJECT "'
     jump false
+    notifies :apply, 'diptables_apply[apply]', :delayed
 end
 
 # reject all the rest
 diptables_rule 'reject_rest' do
     rule '-j REJECT --reject-with icmp-port-unreachable'
     jump false
+    notifies :add, 'diptables_tcp_udp_rule[http_https_web_server]'
 end
